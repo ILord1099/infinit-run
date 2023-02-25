@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {   
     private CharacterController controller;
-
+    public LayerMask layer;
     private float jumpVelocity;
     public float speed;
     public float jumpHeight;
@@ -13,16 +13,23 @@ public class Player : MonoBehaviour
     public float horizontalSpeed;
     private bool isMovingLeft;
     private bool isMovingRight;
+    public float rayRadius;
+    public Animator anim;
+    private bool isDead;
+    private GameController gc;
 
     // Start is called before the first frame update
     void Start()
     {
+        
         controller = GetComponent<CharacterController>();// pega o componente character controler que esta anexado ao script    
+        gc = FindObjectOfType<GameController>();    
     }
 
     // Update is called once per frame
     void Update()
     {
+        OnCollision();
         Vector3 direction = Vector3.forward * speed;// adiciona "1" no Eixo Z de profundidade 
 
         if(controller.isGrounded)
@@ -71,5 +78,27 @@ public class Player : MonoBehaviour
 
         }
         isMovingRight = false;
+    }
+
+    void OnCollision()
+    {
+        RaycastHit hit;
+
+        if(Physics.Raycast(transform.position,transform.TransformDirection(Vector3.forward),out hit, rayRadius,layer)&&!isDead)
+        {
+            //chama gameover
+            anim.SetTrigger("die");
+             speed = 0;
+            jumpHeight = 0;
+            jumpVelocity = 0;
+            horizontalSpeed = 0; 
+            isDead = true;
+        Invoke("GameOver",2f);
+            
+        }
+    }
+    void GameOver()
+    {
+        gc.ShowGameOver();
     }
 }
