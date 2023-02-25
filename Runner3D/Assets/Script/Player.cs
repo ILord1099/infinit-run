@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
-{   
+{       
+    
     private CharacterController controller;
     public LayerMask layer;
+    public LayerMask coinLayer;
     private float jumpVelocity;
     public float speed;
     public float jumpHeight;
@@ -15,7 +17,7 @@ public class Player : MonoBehaviour
     private bool isMovingRight;
     public float rayRadius;
     public Animator anim;
-    private bool isDead;
+    public  bool isDead;
     private GameController gc;
 
     // Start is called before the first frame update
@@ -58,6 +60,8 @@ public class Player : MonoBehaviour
         direction.y = jumpVelocity;
 
         controller.Move(direction*Time.deltaTime);
+
+        
     }
 
     IEnumerator LeftMove()// courrotine pode ser pausada e controlada por tempo
@@ -95,6 +99,13 @@ public class Player : MonoBehaviour
             isDead = true;
         Invoke("GameOver",2f);
             
+        }
+        RaycastHit coinHit;
+
+        if(Physics.Raycast(transform.position,transform.TransformDirection(Vector3.forward + new Vector3(0,1f,0)), out coinHit, rayRadius,coinLayer))
+        {
+            gc.AddCoin();
+            Destroy(coinHit.transform.gameObject);
         }
     }
     void GameOver()
